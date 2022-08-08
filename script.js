@@ -1,57 +1,62 @@
-let PlayerScore = 0;
-let compScore = 0;
+const selectionButtons = document.querySelectorAll('[data-selection]')
+const finalColumn = document.querySelector('[data-final-column]')
+const computerScoreSpan = document.querySelector('[data-computer-score]')
+const yourScoreSpan = document.querySelector('[data-your-score]')
+const SELECTIONS = [
+  {
+    name: 'rock',
+    emoji: '✊',
+    beats: 'scissors'
+  },
+  {
+    name: 'paper',
+    emoji: '✋',
+    beats: 'rock'
+  },
+  {
+    name: 'scissors',
+    emoji: '✌',
+    beats: 'paper'
+  }
+]
 
+selectionButtons.forEach(selectionButton => {
+  selectionButton.addEventListener('click', e => {
+    const selectionName = selectionButton.dataset.selection
+    const selection = SELECTIONS.find(selection => selection.name === selectionName)
+    makeSelection(selection)
+  })
+})
 
-const computerPlay = () => {
-    const arrOfChoices= ['rock', 'paper', 'scissors']
-    const randomNum = Math.floor(Math.random() * 3)
-    const compChoice= arrOfChoices[randomNum]
-    return compChoice
+function makeSelection(selection) {
+  const computerSelection = randomSelection()
+  const yourWinner = isWinner(selection, computerSelection)
+  const computerWinner = isWinner(computerSelection, selection)
+
+  addSelectionResult(computerSelection, computerWinner)
+  addSelectionResult(selection, yourWinner)
+
+  if (yourWinner) incrementScore(yourScoreSpan)
+  if (computerWinner) incrementScore(computerScoreSpan)
 }
 
-const playRound = (playerSelection, ComputerSelection) => {
-    console.log('1 ', playerSelection, '2 ', ComptuterSelection)
-    if (playerSelection === 'rock' && computerSelectin==='rock'){
-        return 'You tied! You both picked rocks'
-    } else if (playerSelection === 'scissors' && ComptuterSelection=== 'scissors'){
-        return 'You tied! You both picked scissors'
-    }else if (playerSelection === 'paper' && ComptuterSelection=== 'paper'){
-        return 'You tied! You both picked paper'
-}else if (playerSelection === 'scissors' && ComptuterSelection=== 'rock'){
-    compScore++
-    return 'You lost! rock crushes scissors'
-}else if (playerSelection === 'scissors' && ComptuterSelection=== 'paper'){
-    PlayerScore++
-    return 'You won! scissors cuts paper'
-}else if (playerSelection === 'rock' && ComptuterSelection=== 'paper'){
-    compScore++
-    return 'You lost! paper covers rock'
-}else if (playerSelection === 'rock' && ComptuterSelection=== 'scissors'){
-    PlayerScore++
-    return 'You won! rock crushes scissors'
-}else if (playerSelection === 'paper' && ComptuterSelection=== 'scissors'){
-    compScore++
-    return 'You lost! scissors cuts paper'
-}else if (playerSelection === 'paper' && ComptuterSelection=== 'rock'){
-    PlayerScore++
-    return 'You won! Paper covers rock'
-}
+function incrementScore(scoreSpan) {
+  scoreSpan.innerText = parseInt(scoreSpan.innerText) + 1
 }
 
-const playerSelection = 'rock'
-
-const game = () => {
-    for (let i=0; i<5; i++){
-        const playerSelection = prompt ('choose what to throw', 'rock, paper, scissors',).toLowerCase()
-        const ComputerSelection = computerPlay()
-        playRound(playerSelection, ComputerSelection)
-    }
+function addSelectionResult(selection, winner) {
+  const div = document.createElement('div')
+  div.innerText = selection.emoji
+  div.classList.add('result-selection')
+  if (winner) div.classList.add('winner')
+  finalColumn.after(div)
 }
 
-if (PlayerScore > compScore){
-    return 'You beat the computer! You are genius'
-}else if(PlayerScore < compScore){
-    return 'you got beaten by the computer! Practice your throws'
-} else {
-    return 'you tied with computer! Not too shappy'
+function isWinner(selection, opponentSelection) {
+  return selection.beats === opponentSelection.name
+}
+
+function randomSelection() {
+  const randomIndex = Math.floor(Math.random() * SELECTIONS.length)
+  return SELECTIONS[randomIndex]
 }
